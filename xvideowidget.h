@@ -4,12 +4,13 @@
 #include <QtOpenGL>
 #include <QTimer>
 #include <QtGui/QImage>
+#include "ivideocall.h"
 
 extern "C" {
 #include "libavutil/frame.h"
 }
 
-class XVideoWidget : public QGLWidget, protected QOpenGLFunctions
+class XVideoWidget : public QGLWidget, protected QOpenGLFunctions, public IVideoCall
 {
     Q_OBJECT
 

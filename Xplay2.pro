@@ -42,7 +42,8 @@ HEADERS += \
     xresample.h \
     xaudioplay.h \
     xaudiothread.h \
-    xvideothread.h
+    xvideothread.h \
+    ivideocall.h
 
 FORMS += \
         xplay2.ui

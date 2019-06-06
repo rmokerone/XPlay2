@@ -12,12 +12,14 @@ using namespace std;
 
 #include <QThread>
 #include "xaudiothread.h"
+#include "xvideothread.h"
 
 
 class TestThread :public QThread
 {
 public:
     XAudioThread at;
+    XVideoThread vt;
     void init() {
         const char *filename = "v1080p.mp4";
         //const char *rtmp_url = "rtmp://202.69.69.180:443/webcast/bshdlive-pc";
@@ -26,23 +28,11 @@ public:
         cout << "audio param: " << xdemux.CopyAPara()<<endl;
         cout << "width: " << xdemux.width<<endl;
         cout << "heigt: " << xdemux.height<<endl;
-        //cout << "seek = " << xdemux.Seek(0.99) << endl;
-
-        cout << "vdecode.Open() = " << vdecode.Open(xdemux.CopyVPara()) << endl;
-
-        //cout << "adecode.Open() = " << adecode.Open(xdemux.CopyAPara()) << endl;
-
-
-        video->Init(xdemux.width, xdemux.height);
-
-        //cout << "resample.Open() = " << resample.Open(xdemux.CopyAPara()) << endl;
-
-        //XAudioPlay::Get()->channels = xdemux.channels;
-        //XAudioPlay::Get()->sampleRate = xdemux.sampleRate;
-        //cout << "XAudioPlay::Get()->Open() = "<< XAudioPlay::Get()->Open() <<endl;
 
         cout << "at.Open = " << at.Open(xdemux.CopyAPara(), xdemux.sampleRate, xdemux.channels) <<endl;
+        vt.Open(xdemux.CopyVPara(), video, xdemux.width, xdemux.height);
         at.start();
+        vt.start();
     }
 
     unsigned char *pcm = new unsigned char[1024 * 1024];
@@ -54,56 +44,18 @@ public:
             }
             if (xdemux.isAudio(pkt)){
                 // 如果是音频
-                /*
-                adecode.Send(pkt);
-                AVFrame *frame = adecode.Recv();
-                //cout << "recv: " << frame << endl;
-                // 先进行数据转码
-                int len = resample.Resample(frame, pcm);
-                //cout << "resample: "<< len << endl;
-
-                while (len > 0){
-                    // 获取有多少空间
-                    //cout << "free = " << free << endl;
-                    if (XAudioPlay::Get()->GetFree() >= len){
-                        XAudioPlay::Get()->Write(pcm, len);
-                        break;
-                    }
-                    //msleep(0.1);
-                }
-                */
                 at.Push(pkt);
             }else{
                 // 如果是视频
-                vdecode.Send(pkt);
-                AVFrame *frame = vdecode.Recv();
-                if (frame){
-                    /*
-                    data = QByteArray((const char *)frame->data[0], xdemux.height * xdemux.width);
-                    data.append((const char *)frame->data[1], xdemux.height * xdemux.width / 4);
-                    data.append((const char *)frame->data[2], xdemux.height * xdemux.width / 4);
-                    av_frame_free(&frame);
-                    //cout << "data size :"<< data.size() << endl;
-                    video->setFrameData(data);
-                    //video->Repaint(frame);
-                    */
-                    video->Repaint(frame);
-                    msleep(40);
-                }
-
-                //cout << "Video: " << frame <<endl;
+                vt.Push(pkt);
+                msleep(40);
             }
         }
 
     }
     // 测试Demux
     XDemux xdemux;
-    XDecode vdecode;
-    XDecode adecode;
-    XResample resample;
     XVideoWidget *video;
-    QByteArray temp_data;
-    QByteArray data;
 };
 
 TestThread tt;

@@ -16,9 +16,15 @@ XVideoThread::~XVideoThread()
 }
 
 // 打开 不管成功与否都清理
-bool XVideoThread::Open(AVCodecParameters *para){
+bool XVideoThread::Open(AVCodecParameters *para, IVideoCall *call, int width, int height){
     if (!para) return false;
     mux.lock();
+    // 初始化显示窗口
+    this->call = call;
+    if (call){
+        call->Init(width, height);
+    }
+    // 打开解码器
     if (!decode) decode = new XDecode();
     bool re = true;
     if (!decode->Open(para)){
@@ -71,7 +77,12 @@ void XVideoThread::run(){
         // 可能一次send 多次Recv
         while (!isExit){
             AVFrame *frame = decode->Recv();
-
+            if (!frame){
+                break;
+            }
+            if (call){
+                call->Repaint(frame);
+            }
         }
         mux.unlock();
     }
