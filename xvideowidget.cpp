@@ -4,6 +4,7 @@
 
 #include "xvideowidget.h"
 
+
 FILE *fp = NULL;
 
 
@@ -138,20 +139,13 @@ void XVideoWidget::initializeGL()
 
 // 不管成功与否都释放frame空间
 void XVideoWidget::Repaint(AVFrame *frame){
-    if (!frame || !buffer)
+    if (!frame)
         return;
-    QMutexLocker lock(&m_mutex);
-    Q_UNUSED(lock);
-    // 容错 保证尺寸正确
-    if ((frame->width != this->width) || (frame->height != this->height)){
-        av_frame_free(&frame);
-        return ;
-    }
-    plane[0].data = frame->data[0];
-    plane[1].data = frame->data[1];
-    plane[2].data = frame->data[2];
-    update();
-    //av_frame_free(&frame);
+    frame_data = QByteArray((const char *)frame->data[0], height * width);
+    frame_data.append((const char *)frame->data[1], height * width / 4);
+    frame_data.append((const char *)frame->data[2], height * width / 4);
+    av_frame_free(&frame);
+    this->setFrameData(frame_data);
 }
 
 
@@ -242,6 +236,10 @@ void XVideoWidget::initTextures()
         glTexImage2D(GL_TEXTURE_2D, 0, P.internal_fmt, P.tex_size.width(), P.tex_size.height(), 0/*border, ES not support*/, P.fmt, P.type, NULL);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
+}
+
+void XVideoWidget::Init(int width, int height){
+    this->setYUV420pParameters(width, height);
 }
 
 void XVideoWidget::setYUV420pParameters(int w, int h, int *strides)

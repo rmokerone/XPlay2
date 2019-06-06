@@ -17,6 +17,7 @@ public:
     XVideoWidget(QWidget *parent = 0);
     ~XVideoWidget();
 
+    virtual void Init(int width, int height);
     virtual void Repaint(AVFrame *frame);
     // YUV420P
     /*!
@@ -49,6 +50,7 @@ protected:
     virtual void paintGL();
     virtual void resizeGL(int w, int h);
 private:
+    QByteArray frame_data;
     char *buffer = nullptr;
     size_t buffer_size = 0;
     bool update_res;

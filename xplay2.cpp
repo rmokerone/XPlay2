@@ -33,7 +33,7 @@ public:
         //cout << "adecode.Open() = " << adecode.Open(xdemux.CopyAPara()) << endl;
 
 
-        video->setYUV420pParameters(xdemux.width, xdemux.height);
+        video->Init(xdemux.width, xdemux.height);
 
         //cout << "resample.Open() = " << resample.Open(xdemux.CopyAPara()) << endl;
 
@@ -78,7 +78,7 @@ public:
                 vdecode.Send(pkt);
                 AVFrame *frame = vdecode.Recv();
                 if (frame){
-
+                    /*
                     data = QByteArray((const char *)frame->data[0], xdemux.height * xdemux.width);
                     data.append((const char *)frame->data[1], xdemux.height * xdemux.width / 4);
                     data.append((const char *)frame->data[2], xdemux.height * xdemux.width / 4);
@@ -86,6 +86,8 @@ public:
                     //cout << "data size :"<< data.size() << endl;
                     video->setFrameData(data);
                     //video->Repaint(frame);
+                    */
+                    video->Repaint(frame);
                     msleep(40);
                 }
 
