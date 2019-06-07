@@ -12,7 +12,8 @@ XPlay2::XPlay2(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::XPlay2)
 {
-    const char *filename = "v1080p.mp4";
+    const char *filename = "v1080.mp4";
+    const char *url = "rtmp://202.69.69.180:443/webcast/bshdlive-pc";
     ui->setupUi(this);
     this->setWindowFlags(Qt::FramelessWindowHint);
 

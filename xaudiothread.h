@@ -16,6 +16,8 @@ extern "C" {
 class XAudioThread: public QThread
 {
 public:
+    // 当前音频播放对应的pts
+    long long pts = 0;
     // 打开，不管成功与否 都清理para
     virtual bool Open(AVCodecParameters *para, int sampleRate, int channels);
     virtual void Push(AVPacket *pkt);

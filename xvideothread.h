@@ -25,6 +25,8 @@ public:
     // 最大队列数量
     int maxList = 100;
     bool isExit = false;
+    // 同步时间 由外部传入
+    long long syncpts = 0;
 
 protected:
     std::list <AVPacket *> packs;

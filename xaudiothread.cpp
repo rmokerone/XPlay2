@@ -3,6 +3,7 @@
 using namespace std;
 
 bool XAudioThread::Open(AVCodecParameters *para, int sampleRate, int channels){
+    pts = 0;
     if (!para)
         return false;
     mux.lock();
@@ -82,6 +83,11 @@ void XAudioThread::run() {
         // 可能一次send 多次Recv
         while (!isExit){
             AVFrame *frame = decode->Recv();
+
+            // 减去缓冲中未播放的ms
+            pts = decode->pts - ap->GetNoPlayMs();
+            cout << "audio pts = "<< pts <<endl;
+
             if (!frame) break;
             // 重采样
             int size = res->Resample(frame, pcm);

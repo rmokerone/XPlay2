@@ -46,9 +46,9 @@ bool XDemuxThread::Open(const char *url, IVideoCall *call){
 
 void  XDemuxThread::Start(){
     mux.lock();
+    this->start();
     if (vt) vt->start();
     if (at) at->start();
-    this->start();
     mux.unlock();
 }
 
@@ -60,6 +60,11 @@ void XDemuxThread::run(){
             msleep(5);
             continue;
         }
+        // 同步
+        if (vt && at){
+            vt->syncpts = at->pts;
+        }
+
         AVPacket *pkt = xdemux->Read();
         if (!pkt){
             mux.unlock();
@@ -73,9 +78,11 @@ void XDemuxThread::run(){
                 at->Push(pkt);
         }else{
             // 如果为视频
-            vt->Push(pkt);
-            msleep(40);
+            if (vt)
+                vt->Push(pkt);
+            //msleep(30);
         }
         mux.unlock();
+
     }
 }

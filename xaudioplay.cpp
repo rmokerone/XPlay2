@@ -15,6 +15,8 @@ public:
 
     virtual bool Open(){
         Close();
+        // 一秒音频的字节大小
+        sizeps = sampleRate * sampleSize * channels;
         QAudioFormat fmt;
         fmt.setSampleRate(sampleRate);
         fmt.setSampleSize(sampleSize);
@@ -71,7 +73,27 @@ public:
         mux.unlock();
         return free;
     }
+
+    //获取还未播放的时间ms
+    long long GetNoPlayMs(){
+        mux.lock();
+        if(!output){
+            mux.unlock();
+            return 0;
+        }
+        long long pts = 0;
+        // 还未播放的字节大小
+        double size = output->bufferSize() - output->bytesFree();
+        {
+            // 计算出对应的ms
+            pts = size * 1000 / sizeps;
+        }
+        mux.unlock();
+        return pts;
+    }
+
 };
+
 
 XAudioPlay::XAudioPlay()
 {

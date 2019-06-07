@@ -13,6 +13,10 @@ public:
     virtual void Close() = 0;
     virtual bool Write(const unsigned char *data, int datasize) = 0;
     virtual int GetFree() = 0;
+    // 返回缓冲中还没有播放的时间 单位ms
+    virtual long long GetNoPlayMs() = 0;
+    // 一秒音频的字节大小
+    double sizeps = 0;
 
     static XAudioPlay *Get();
     XAudioPlay();

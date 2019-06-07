@@ -141,11 +141,14 @@ void XVideoWidget::initializeGL()
 void XVideoWidget::Repaint(AVFrame *frame){
     if (!frame)
         return;
-    frame_data = QByteArray((const char *)frame->data[0], height * width);
-    frame_data.append((const char *)frame->data[1], height * width / 4);
-    frame_data.append((const char *)frame->data[2], height * width / 4);
+    QMutexLocker lock(&m_mutex);
+    Q_UNUSED(lock);
+    upload_tex = true;
+    plane[0].data = frame->data[0];
+    plane[1].data = frame->data[1];
+    plane[2].data = frame->data[2];
+    update();
     av_frame_free(&frame);
-    this->setFrameData(frame_data);
 }
 
 

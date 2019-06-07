@@ -51,7 +51,6 @@ protected:
     virtual void paintGL();
     virtual void resizeGL(int w, int h);
 private:
-    QByteArray frame_data;
     char *buffer = nullptr;
     size_t buffer_size = 0;
     bool update_res;

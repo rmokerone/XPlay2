@@ -17,6 +17,7 @@ XVideoThread::~XVideoThread()
 
 // 打开 不管成功与否都清理
 bool XVideoThread::Open(AVCodecParameters *para, IVideoCall *call, int width, int height){
+    syncpts = 0;
     if (!para) return false;
     mux.lock();
     // 初始化显示窗口
@@ -40,16 +41,13 @@ void XVideoThread::Push(AVPacket *pkt){
     if (!pkt)
         return;
     // 写入数据到队列
-
+    mux.lock();
     // 阻塞
     while (!isExit){
-        mux.lock();
         if (packs.size() < maxList){
             packs.push_back(pkt);
-            mux.unlock();
             break;
         }
-        mux.unlock();
         msleep(1);
     }
     mux.unlock();
@@ -60,6 +58,14 @@ void XVideoThread::run(){
         mux.lock();
         // 如果没有数据
         if (packs.empty() || !decode ){
+            mux.unlock();
+            msleep(1);
+            continue;
+        }
+
+        // 同步判断
+        cout << "video pts = "<< decode->pts <<endl;
+        if (syncpts > 0 && syncpts < decode->pts){
             mux.unlock();
             msleep(1);
             continue;

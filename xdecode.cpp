@@ -99,6 +99,8 @@ AVFrame *XDecode::Recv(){
     }
 
     //cout << "linesize[0]: "<< frame->linesize[0] << " " << flush;
+    // 设置pts时间戳
+    pts = frame->pts;
     return frame;
 }
 
@@ -109,6 +111,7 @@ void XDecode::Close(){
         avcodec_close(codec);
         avcodec_free_context(&codec);
     }
+    pts = 0;
     mux.unlock();
 }
 
