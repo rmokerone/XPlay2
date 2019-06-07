@@ -33,7 +33,8 @@ SOURCES += \
     xaudioplay.cpp \
     xaudiothread.cpp \
     xvideothread.cpp \
-    xdemuxthread.cpp
+    xdemuxthread.cpp \
+    xdecodethread.cpp
 
 HEADERS += \
         xplay2.h \
@@ -45,7 +46,8 @@ HEADERS += \
     xaudiothread.h \
     xvideothread.h \
     ivideocall.h \
-    xdemuxthread.h
+    xdemuxthread.h \
+    xdecodethread.h
 
 FORMS += \
         xplay2.ui

@@ -280,8 +280,8 @@ void XVideoWidget::setYUV420pParameters(int w, int h, int *strides)
     }
 
     // 申请缓冲区
-    buffer_size = (size_t) sizeof(char) * height * width * 1.5;
-    buffer = (char *)malloc(buffer_size);
+    // buffer_size = (size_t) sizeof(char) * height * width * 1.5;
+    // buffer = (char *)malloc(buffer_size);
 }
 
 void XVideoWidget::setQImageParameters(QImage::Format fmt, int w, int h, int stride)
@@ -328,7 +328,7 @@ void XVideoWidget::paintGL()
     //
     QMutexLocker lock(&m_mutex);
     Q_UNUSED(lock);
-    if (!plane[0].data)
+    if (!plane.size() || !plane[0].data)
         return;
     if (update_res || !tex[0]) {
         initializeShader();

@@ -106,6 +106,7 @@ void XAudioThread::run() {
             }
         }
         mux.unlock();
+        msleep(10);
     }
     delete pcm;
 }

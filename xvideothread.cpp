@@ -64,12 +64,12 @@ void XVideoThread::run(){
         }
 
         // 同步判断
-        cout << "video pts = "<< decode->pts <<endl;
         if (syncpts > 0 && syncpts < decode->pts){
             mux.unlock();
             msleep(1);
             continue;
         }
+        cout << "video pts = "<< decode->pts <<endl;
 
         AVPacket *pkt = packs.front();
         packs.pop_front();
@@ -80,7 +80,7 @@ void XVideoThread::run(){
             msleep(1);
             continue;
         }
-        // 可能一次send 多次Recv
+
         while (!isExit){
             AVFrame *frame = decode->Recv();
             if (!frame){
@@ -89,7 +89,9 @@ void XVideoThread::run(){
             if (call){
                 call->Repaint(frame);
             }
+            msleep(1);
         }
         mux.unlock();
+        msleep(10);
     }
 }
