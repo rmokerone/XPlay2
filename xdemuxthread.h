@@ -3,6 +3,7 @@
 
 #include <QThread>
 #include "xdemux.h"
+#include "xdecode.h"
 #include "xaudiothread.h"
 #include "xvideothread.h"
 #include <mutex>
@@ -21,12 +22,21 @@ public:
     // 关闭线程 清理资源
     virtual void Close();
 
+    // 清理缓冲
+    virtual void Clear();
+
+    virtual void Seek(double pos);
+
+    void setPause(bool isPause);
+    bool isPause = false;
+
     XDemuxThread();
     ~XDemuxThread();
 
     long long pts = 0;
     long long totalMs  = 0;
     bool isExit = false;
+
 protected:
     std::mutex mux;
     XDemux *xdemux = 0;

@@ -10,7 +10,6 @@ extern "C" {
 }
 
 
-
 static double r2d(AVRational r){
     return r.den == 0 ? 0 : (double) r.num / (double)r.den ;
 }
@@ -32,7 +31,6 @@ XDemux::XDemux()
 
 XDemux::~XDemux()
 {
-
 }
 
 

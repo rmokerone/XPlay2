@@ -17,10 +17,22 @@ public:
     // 定时器 滑动条显示
     void timerEvent(QTimerEvent *e);
 
+    // 窗口尺寸变化
+    void resizeEvent(QResizeEvent *e);
+
+    // 双击窗口 点击相应
+    void mouseDoubleClickEvent(QMouseEvent *e);
+
+    void setPause(bool isPlay);
+
 public slots:
     void openFile();
+    void PlayOrPause();
+    void sliderPressSlot();
+    void sliderReleaseSlot();
 
 private:
+    bool isSliderPressed = false;
     Ui::XPlay2 *ui;
 };
 

@@ -60,10 +60,20 @@ void  XDemuxThread::Start(){
 
 void XDemuxThread::run(){
     while (!isExit){
+
+
+
         mux.lock();
+
+        if (isPause){
+            mux.unlock();
+            msleep(1);
+            continue;
+        }
+
         if (!xdemux){
             mux.unlock();
-            msleep(5);
+            msleep(1);
             continue;
         }
         // 同步
@@ -112,5 +122,79 @@ void XDemuxThread::Close()
     delete at;
     vt = NULL;
     at = NULL;
+    mux.unlock();
+}
+
+void XDemuxThread::Clear()
+{
+    mux.lock();
+    if (xdemux) xdemux->Clear();
+    if (at) at->Clear();
+    if (vt) vt->Clear();
+    mux.unlock();
+}
+
+void XDemuxThread::Seek(double pos)
+{
+    // 清理缓存
+    Clear();
+
+    mux.lock();
+    bool currentPause = isPause;
+    mux.unlock();
+
+
+    // 暂停其他线程
+    setPause(true);
+
+    mux.lock();
+    if (xdemux)
+        xdemux->Seek(pos);
+
+    // 实际要显示的位置
+    long long seekPts = pos * xdemux->totalMs;
+
+    while (!isExit){
+        AVPacket *pkt = xdemux->Read();
+        if (!pkt) break;
+        if (xdemux->isAudio(pkt)){
+            // 为音频
+            XFreePacket(&pkt);
+            continue;
+        }else{
+            // 为视频
+            bool re = vt->decode->Send(pkt);
+            if (!re){
+                break;
+            }else{
+                // 解码出AVFrame
+                AVFrame *frame = vt->decode->Recv();
+                if (!frame){
+                    continue;
+                }else{
+                    if (frame->pts >= seekPts){
+                        // 更新时间戳
+                        this->pts = frame->pts;
+                        vt->call->Repaint(frame);
+                        break;
+                    }
+                }
+                av_frame_free(&frame);
+            }
+        }
+    }
+    mux.unlock();
+    // 一开始不是暂停状态 启动其他线程
+    if (currentPause == false)
+        setPause(false);
+}
+
+// 设置暂停
+void XDemuxThread::setPause(bool isPause)
+{
+    mux.lock();
+    this->isPause = isPause;
+    if (at) at->setPause(isPause);
+    if (vt) vt->setPause(isPause);
     mux.unlock();
 }

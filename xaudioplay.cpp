@@ -92,6 +92,31 @@ public:
         return pts;
     }
 
+    void setPause(bool isPause)
+    {
+        mux.lock();
+        if (!output){
+            mux.unlock();
+            return;
+        }
+        if (isPause){
+            output->suspend();
+        }else{
+            output->resume();
+        }
+        mux.unlock();
+    }
+
+    void Clear()
+    {
+        mux.lock();
+        if (io){
+            io->reset();
+        }
+        mux.unlock();
+    }
+
+
 };
 
 
@@ -103,6 +128,9 @@ XAudioPlay::~XAudioPlay()
 {
 
 }
+
+
+
 
 XAudioPlay *XAudioPlay::Get(){
     static CXAudioPlay play;

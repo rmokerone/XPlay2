@@ -26,9 +26,12 @@ public:
     // 同步时间 由外部传入
     long long syncpts = 0;
 
+    void setPause(bool isPause);
+    bool isPause = false;
+    IVideoCall *call = 0;
 protected:
     std::mutex vmux;
-    IVideoCall *call = 0;
+
 };
 
 #endif // XVIDEOTHREAD_H
