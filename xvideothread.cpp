@@ -96,3 +96,30 @@ void XVideoThread::run(){
         msleep(10);
     }
 }
+
+bool XVideoThread::RepaintPts(AVPacket *pkt, long long seekPts)
+{
+    vmux.lock();
+    bool re  = decode->Send(pkt);
+    if (!re){
+        vmux.unlock();
+        return false;
+    }else{
+        // 解码出AVFrame
+        AVFrame *frame = decode->Recv();
+        if (!frame){
+            vmux.unlock();
+            return false;
+        }else{
+            if (frame->pts >= seekPts){
+                if (call) call->Repaint(frame);
+                vmux.unlock();
+                return true;
+            }
+        }
+        av_frame_free(&frame);
+    }
+    vmux.unlock();
+    return false;
+}
+

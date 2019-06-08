@@ -155,32 +155,12 @@ void XDemuxThread::Seek(double pos)
     long long seekPts = pos * xdemux->totalMs;
 
     while (!isExit){
-        AVPacket *pkt = xdemux->Read();
+        AVPacket *pkt = xdemux->ReadVideo();
         if (!pkt) break;
-        if (xdemux->isAudio(pkt)){
-            // 为音频
-            XFreePacket(&pkt);
-            continue;
-        }else{
-            // 为视频
-            bool re = vt->decode->Send(pkt);
-            if (!re){
-                break;
-            }else{
-                // 解码出AVFrame
-                AVFrame *frame = vt->decode->Recv();
-                if (!frame){
-                    continue;
-                }else{
-                    if (frame->pts >= seekPts){
-                        // 更新时间戳
-                        pts = frame->pts;
-                        vt->call->Repaint(frame);
-                        break;
-                    }
-                }
-                av_frame_free(&frame);
-            }
+        // 为视频
+        if (vt->RepaintPts(pkt, seekPts)){
+            pts = seekPts;
+            break;
         }
     }
     mux.unlock();

@@ -19,6 +19,8 @@ public:
     // 打开 不管成功与否都清理
     virtual bool Open(AVCodecParameters *para, IVideoCall *call, int width, int height);
     void run();
+    // 解码pts 如果接收到的pkt解码后的pts >= seekPts 返回true 并显示 否则返回false
+    virtual bool RepaintPts(AVPacket *pkt, long long seekPts);
 
     XVideoThread();
     virtual ~XVideoThread();
@@ -28,8 +30,9 @@ public:
 
     void setPause(bool isPause);
     bool isPause = false;
-    IVideoCall *call = 0;
+
 protected:
+    IVideoCall *call = 0;
     std::mutex vmux;
 
 };

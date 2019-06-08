@@ -138,6 +138,21 @@ AVPacket *XDemux::Read(){
     return pkt;
 }
 
+AVPacket *XDemux::ReadVideo()
+{
+    AVPacket *pkt = NULL;
+    // 防止阻塞
+    for (int i = 0; i < 20; i++){
+        pkt = Read();
+
+        if(pkt->stream_index == videoStream){
+            break;
+        }
+        av_packet_free(&pkt);
+    }
+    return pkt;
+}
+
 // 获取视频参数 返回的空间需要清理 avcodec_parameters_free
 AVCodecParameters *XDemux::CopyVPara(){
     mux.lock();

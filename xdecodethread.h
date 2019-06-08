@@ -27,8 +27,8 @@ public:
     // 最大队列数量
     int maxList = 100;
     bool isExit = false;
-    XDecode *decode = 0;
 protected:
+    XDecode *decode = 0;
     std::list <AVPacket *> packs;
     std::mutex mux;
 
