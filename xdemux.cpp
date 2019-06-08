@@ -140,11 +140,22 @@ AVPacket *XDemux::Read(){
 
 AVPacket *XDemux::ReadVideo()
 {
+    mux.lock();
+    // 如果没有打开ic 就直接做Read了
+    if (!ic){
+        mux.unlock();
+        return NULL;
+    }
+    mux.unlock();
+
+
     AVPacket *pkt = NULL;
     // 防止阻塞
     for (int i = 0; i < 20; i++){
         pkt = Read();
-
+        if (!pkt){
+            break;
+        }
         if(pkt->stream_index == videoStream){
             break;
         }

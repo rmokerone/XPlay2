@@ -2,12 +2,15 @@
 #define XSLIDER_H
 
 #include <QWidget>
+#include <QSlider>
 
-class XSlider : public QWidget
+class XSlider : public QSlider
 {
     Q_OBJECT
 public:
     explicit XSlider(QWidget *parent = nullptr);
+    ~XSlider();
+    void mousePressEvent(QMouseEvent *e);
 
 signals:
 
