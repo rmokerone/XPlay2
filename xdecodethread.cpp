@@ -16,17 +16,19 @@ XDecodeThread::~XDecodeThread()
 void XDecodeThread::Push(AVPacket *pkt){
     if (!pkt)
         return;
-    // 写入数据到队列
-    mux.lock();
+
     // 阻塞
     while (!isExit){
+        // 写入数据到队列
+        mux.lock();
         if (packs.size() < maxList){
             packs.push_back(pkt);
+            mux.unlock();
             break;
         }
+        mux.unlock();
         msleep(1);
     }
-    mux.unlock();
 }
 
 // 取出一帧数据，并出栈，如果没有数据返回NULL
