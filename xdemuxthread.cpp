@@ -174,7 +174,7 @@ void XDemuxThread::Seek(double pos)
                 }else{
                     if (frame->pts >= seekPts){
                         // 更新时间戳
-                        this->pts = frame->pts;
+                        pts = frame->pts;
                         vt->call->Repaint(frame);
                         break;
                     }

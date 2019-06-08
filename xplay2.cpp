@@ -76,6 +76,7 @@ void XPlay2::timerEvent(QTimerEvent *e)
     if (isSliderPressed) return;
     long long totalMs = dt.totalMs;
     if (totalMs > 0){
+
         double pos = (double)dt.pts / (double)totalMs;
         int v = ui->playSlider->maximum() * pos;
         ui->playSlider->setValue(v);

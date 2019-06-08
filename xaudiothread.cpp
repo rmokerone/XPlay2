@@ -52,12 +52,12 @@ void XAudioThread::Close(){
     }
 }
 
-void XAudioThread:: Clear()
+void XAudioThread::Clear()
 {
     XDecodeThread::Clear();
-    amux.lock();
+    mux.lock();
     if (ap) ap->Clear();
-    amux.unlock();
+    mux.unlock();
 }
 
 
