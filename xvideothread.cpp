@@ -17,6 +17,7 @@ XVideoThread::~XVideoThread()
 bool XVideoThread::Open(AVCodecParameters *para, IVideoCall *call, int width, int height){
     syncpts = 0;
     if (!para) return false;
+    Clear();
     vmux.lock();
     // 初始化显示窗口
     this->call = call;
@@ -36,6 +37,7 @@ bool XVideoThread::Open(AVCodecParameters *para, IVideoCall *call, int width, in
 
 }
 
+
 void XVideoThread::run(){
 
     while(!isExit){
@@ -47,10 +49,16 @@ void XVideoThread::run(){
             msleep(1);
             continue;
         }
-        cout << "video pts = "<< decode->pts <<endl;
 
 
         AVPacket *pkt = Pop();
+        if (!pkt){
+            vmux.unlock();
+            msleep(1);
+            continue;
+        }
+
+        cout << "video pts = "<< decode->pts <<endl;
         // 解码
         int re = decode->Send(pkt);
         if (!re){

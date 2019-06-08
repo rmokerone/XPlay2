@@ -18,7 +18,6 @@ class XVideoThread: public XDecodeThread
 public:
     // 打开 不管成功与否都清理
     virtual bool Open(AVCodecParameters *para, IVideoCall *call, int width, int height);
-
     void run();
 
     XVideoThread();

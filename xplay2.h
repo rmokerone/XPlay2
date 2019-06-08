@@ -14,6 +14,8 @@ class XPlay2 : public QWidget
 public:
     explicit XPlay2(QWidget *parent = 0);
     ~XPlay2();
+    // 定时器 滑动条显示
+    void timerEvent(QTimerEvent *e);
 
 public slots:
     void openFile();

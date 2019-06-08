@@ -6,6 +6,8 @@ bool XAudioThread::Open(AVCodecParameters *para, int sampleRate, int channels){
     pts = 0;
     if (!para)
         return false;
+    Clear();
+
     amux.lock();
 
     // 打开重采样部分
@@ -30,6 +32,24 @@ bool XAudioThread::Open(AVCodecParameters *para, int sampleRate, int channels){
     amux.unlock();
     cout << "XAudioThread::Open :"<< re <<endl;
     return re;
+}
+
+void XAudioThread::Close(){
+    XDecodeThread::Close();
+    if (res){
+        res->Close();
+        amux.lock();
+        delete res;
+        res = NULL;
+        amux.unlock();
+    }
+
+    if (ap){
+        ap->Close();
+        amux.lock();
+        ap = NULL;
+        amux.unlock();
+    }
 }
 
 

@@ -15,13 +15,13 @@ XPlay2::XPlay2(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::XPlay2)
 {
-    const char *filename = "v1080p.mp4";
-    const char *url = "rtmp://202.69.69.180:443/webcast/bshdlive-pc";
 
     ui->setupUi(this);
     this->setWindowFlags(Qt::FramelessWindowHint);
 
     dt.Start();
+    // 开启滑动条时间显示定时器
+    startTimer(40);
 }
 
 void XPlay2::openFile(){
@@ -44,5 +44,17 @@ void XPlay2::openFile(){
 
 XPlay2::~XPlay2()
 {
+    dt.Close();
     delete ui;
+}
+
+// 定时器 滑动条显示
+void XPlay2::timerEvent(QTimerEvent *e)
+{
+    long long totalMs = dt.totalMs;
+    if (totalMs > 0){
+        double pos = (double)dt.pts / (double)totalMs;
+        int v = ui->playSlider->maximum() * pos;
+        ui->playSlider->setValue(v);
+    }
 }

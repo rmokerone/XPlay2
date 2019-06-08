@@ -18,8 +18,14 @@ public:
     virtual void Start();
     //
     void run();
+    // 关闭线程 清理资源
+    virtual void Close();
+
     XDemuxThread();
     ~XDemuxThread();
+
+    long long pts = 0;
+    long long totalMs  = 0;
     bool isExit = false;
 protected:
     std::mutex mux;

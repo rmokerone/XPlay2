@@ -39,6 +39,9 @@ bool XDemuxThread::Open(const char *url, IVideoCall *call){
         re = false;
         cout << "at-Open failed"<<endl;
     }
+    // 开放总的时间长度
+    totalMs = xdemux->totalMs;
+
     mux.unlock();
     cout << "XDemuxThread::Open :"<<re<<endl;
     return re;
@@ -65,6 +68,7 @@ void XDemuxThread::run(){
         }
         // 同步
         if (vt && at){
+            pts = at->pts;
             vt->syncpts = at->pts;
         }
 
@@ -89,4 +93,24 @@ void XDemuxThread::run(){
         mux.unlock();
 
     }
+}
+
+// 停止线程 释放资源
+void XDemuxThread::Close()
+{
+    isExit = true;
+    wait();
+
+    if (vt){
+        vt->Close();
+    }
+    if (at){
+        at->Close();
+    }
+    mux.lock();
+    delete vt;
+    delete at;
+    vt = NULL;
+    at = NULL;
+    mux.unlock();
 }

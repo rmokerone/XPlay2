@@ -43,3 +43,28 @@ AVPacket *XDecodeThread::Pop(){
     mux.unlock();
     return pkt;
 }
+
+void XDecodeThread::Clear(){
+    mux.lock();
+    decode->Clear();
+    while (packs.size()){
+        AVPacket *pkt = packs.front();
+        XFreePacket(&pkt);
+        packs.pop_front();
+    }
+    mux.unlock();
+}
+
+
+// 清理资源，停止线程
+void XDecodeThread::Close(){
+    Clear();
+    // 等待线程
+    isExit = true;
+    wait();
+    mux.lock();
+    decode->Close();
+    delete decode;
+    decode = NULL;
+    mux.unlock();
+}
