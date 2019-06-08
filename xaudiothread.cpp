@@ -6,17 +6,8 @@ bool XAudioThread::Open(AVCodecParameters *para, int sampleRate, int channels){
     pts = 0;
     if (!para)
         return false;
-    mux.lock();
+    amux.lock();
 
-    if (!decode){
-        decode = new XDecode();
-    }
-    if (!res){
-        res = new XResample();
-    }
-    if (!ap){
-        ap = XAudioPlay::Get();
-    }
     // 打开重采样部分
     bool re = true;
     if (!res->Open(para, false)){
@@ -36,47 +27,23 @@ bool XAudioThread::Open(AVCodecParameters *para, int sampleRate, int channels){
         re = false;
         cout << "XDecode Open failed"<<endl;
     }
-    mux.unlock();
+    amux.unlock();
     cout << "XAudioThread::Open :"<< re <<endl;
     return re;
 }
 
-void XAudioThread::Push(AVPacket *pkt){
-    if (!pkt)
-        return;
-    // 写入数据到队列
-
-    // 阻塞
-    while (!isExit){
-        mux.lock();
-        if (packs.size() < maxList){
-            packs.push_back(pkt);
-            mux.unlock();
-            break;
-        }
-        mux.unlock();
-        msleep(1);
-    }
-    mux.unlock();
-}
 
 void XAudioThread::run() {
     unsigned char *pcm = new unsigned char[1024 * 1024 * 10];
     while(!isExit){
-        mux.lock();
+        amux.lock();
         // 如果没有数据
-        if (packs.empty() || !decode ||!res ||!ap){
-            mux.unlock();
-            msleep(1);
-            continue;
-        }
 
-        AVPacket *pkt = packs.front();
-        packs.pop_front();
+        AVPacket *pkt = Pop();
         // 解码
         int re = decode->Send(pkt);
         if (!re){
-            mux.unlock();
+            amux.unlock();
             msleep(1);
             continue;
         }
@@ -105,7 +72,7 @@ void XAudioThread::run() {
                 break;
             }
         }
-        mux.unlock();
+        amux.unlock();
         msleep(10);
     }
     delete pcm;
@@ -113,12 +80,14 @@ void XAudioThread::run() {
 
 XAudioThread::XAudioThread()
 {
-
+    if (!res){
+        res = new XResample();
+    }
+    if (!ap){
+        ap = XAudioPlay::Get();
+    }
 }
 
 XAudioThread::~XAudioThread()
 {
-    // 等待线程退出
-    isExit = true;
-    wait();
 }
